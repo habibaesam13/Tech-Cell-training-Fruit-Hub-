@@ -14,4 +14,9 @@ class Payment extends Model
         "paid_at",
         "transaction_id",
     ];
+    public function order()
+{
+    return $this->belongsTo(Order::class);
+}
+
 }
