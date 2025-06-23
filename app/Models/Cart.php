@@ -20,4 +20,10 @@ public function cartItems()
     return $this->hasMany(CartItems::class);
 }
 
+public function items()
+{
+    return $this->hasMany(CartItems::class);
+}
+
+
 }
