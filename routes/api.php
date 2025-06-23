@@ -7,4 +7,3 @@ use App\Http\Controllers\Api\CartController;
 
 Route::apiResource('cart', CartController::class)->only(['index', 'store']);
 
-

@@ -17,12 +17,6 @@ class CartController extends Controller
     
     public function store(StoreCartItemRequest $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        
         // $user = $request->user();
         $user = User::find(1);
         $product = Product::findOrFail($request->product_id);
