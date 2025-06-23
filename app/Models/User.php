@@ -60,5 +60,9 @@ public function payments()
 {
     return $this->hasManyThrough(Payment::class, Order::class);
 }
+public function cart()
+{
+    return $this->hasOne(Cart::class);
+}
 
 }

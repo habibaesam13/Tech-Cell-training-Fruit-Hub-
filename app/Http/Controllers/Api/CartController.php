@@ -2,58 +2,94 @@
 
 namespace App\Http\Controllers\Api;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Models\CartItems;
+use App\Models\Cart;
+use App\Models\User;
 use App\Models\Product;
+use App\Models\CartItems;
+use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Traits\ApiResponseTrait;
+use App\Http\Requests\StoreCartItemRequest;
 
 class CartController extends Controller
 {
-    // Add item to cart
-    public function addItem(Request $request)
+    use ApiResponseTrait;
+    
+    public function store(StoreCartItemRequest $request)
     {
-        $request->validate([
-            'product_id' => 'required|exists:products,id',
-            'quantity' => 'required|integer|min:1',
-        ]);
-
-        $user = $request->user();
+        // $user = $request->user();
+        $user = User::find(1);
         $product = Product::findOrFail($request->product_id);
 
-        // Check if the item already exists in the cart
-        $cartItem = CartItems::where('user_id', $user->id)
+            // Check stock availability
+        if ($product->quantity < $request->quantity) {
+            return $this->errorResponse("Only {$product->stock} items left in stock.", 422);
+        }
+        // Get or create cart
+        $cart = $user->cart;
+        if (!$cart) {
+            $cart = Cart::create([
+                'user_id' => $user->id,
+            ]);
+        }
+
+        $cartId = $cart->id; 
+        $cartItem = CartItems::where('cart_id', $cart->id)
             ->where('product_id', $product->id)
             ->first();
 
+        
+
         if ($cartItem) {
-            // Update quantity
-            $cartItem->quantity += $request->quantity;
+            // Check again for total quantity if increasing
+            $newQuantity = $cartItem->quantity + $request->quantity;
+            if ($product->quantity < $newQuantity) {
+                return $this->errorResponse("Cannot add. Total exceeds stock ({$product->stock}).", 422);
+            }
+
+            $cartItem->quantity = $newQuantity;
             $cartItem->save();
         } else {
             // Create new cart item
             $cartItem = CartItems::create([
-                'user_id' => $user->id,
+                'cart_id' =>$cartId,
                 'product_id' => $product->id,
                 'quantity' => $request->quantity,
                 'price' => $product->price,
             ]);
         }
 
+        // Deduct stock from product
+        $product->quantity -= $request->quantity;
+        $product->save();
+
+        return $this->successResponse(
+            ['item' => $cartItem->load('product')],
+            'Item added to cart and product stock updated.',
+            200
+        );
+    }
+
+
+    public function index(Request $request)
+{
+    $user = User::find(1);
+    $cart = $user->cart;
+
+    if (!$cart) {
         return response()->json([
-            'message' => 'Item added to cart successfully',
-            'item' => $cartItem->load('product'),
+            'message' => 'Cart is empty or not created yet.',
+            'items' => [],
         ]);
     }
 
-    // List all items in cart
-    public function listItems(Request $request)
-    {
-        $cartItems = CartItems::with('product')
-            ->where('user_id', $request->user()->id)
-            ->get();
+    $cartItems = CartItems::with('product')
+        ->where('cart_id', $cart->id)
+        ->get();
 
-        return response()->json([
-            'items' => $cartItems,
-        ]);
-    }
+    return response()->json([
+        'items' => $cartItems,
+    ]);
+}
+
 }
