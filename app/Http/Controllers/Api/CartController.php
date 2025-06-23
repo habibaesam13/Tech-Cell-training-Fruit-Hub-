@@ -9,12 +9,13 @@ use App\Models\CartItems;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponseTrait;
+use App\Http\Requests\StoreCartItemRequest;
 
 class CartController extends Controller
 {
     use ApiResponseTrait;
     
-    public function store(Request $request)
+    public function store(StoreCartItemRequest $request)
     {
         $request->validate([
             'product_id' => 'required|exists:products,id',
@@ -48,7 +49,7 @@ class CartController extends Controller
         if ($cartItem) {
             // Check again for total quantity if increasing
             $newQuantity = $cartItem->quantity + $request->quantity;
-            if ($product->stock < $newQuantity) {
+            if ($product->quantity < $newQuantity) {
                 return $this->errorResponse("Cannot add. Total exceeds stock ({$product->stock}).", 422);
             }
 
