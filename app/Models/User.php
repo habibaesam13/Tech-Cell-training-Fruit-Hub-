@@ -6,11 +6,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -21,6 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'phone_number'
     ];
 
     /**
@@ -47,18 +49,17 @@ class User extends Authenticatable
     }
 
     public function cartItems()
-{
-    return $this->hasMany(CartItems::class);
-}
+    {
+        return $this->hasMany(CartItems::class);
+    }
 
-public function orders()
-{
-    return $this->hasMany(Order::class);
-}
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
 
-public function payments()
-{
-    return $this->hasManyThrough(Payment::class, Order::class);
-}
-
+    public function payments()
+    {
+        return $this->hasManyThrough(Payment::class, Order::class);
+    }
 }
