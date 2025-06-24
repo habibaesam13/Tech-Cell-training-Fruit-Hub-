@@ -27,5 +27,9 @@ public function payment()
 {
     return $this->hasOne(Payment::class);
 }
+public function items()
+{
+    return $this->hasMany(\App\Models\OrderItems::class, 'order_id');
+}
 
 }
