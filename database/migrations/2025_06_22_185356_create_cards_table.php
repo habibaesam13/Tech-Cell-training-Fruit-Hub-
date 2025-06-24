@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
-            $table->date("date");
+            $table->date("expiry_date");
             $table->text('card_number');
             $table->integer("ccv");
             $table->string("holder_name");
