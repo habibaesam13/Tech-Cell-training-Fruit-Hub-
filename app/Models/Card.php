@@ -10,6 +10,7 @@ class Card extends Model
         "date",
         "card_number",
         "ccv",
+        "expiry_date",
         "holder_name",
     ];
 }
