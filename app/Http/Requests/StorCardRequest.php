@@ -23,7 +23,7 @@ class StorCardRequest extends FormRequest
     {
         return [
             'delivery_address' => 'required|string|max:255',
-            'phone' => 'required|digits_between:10,15',
+            'phone_number' => 'required|digits_between:10,15',
             'payment_method' => 'required|in:COD,visa',
             'user_id'       => 'required|exists:users,id',
             // Required if visa payment
@@ -42,8 +42,8 @@ class StorCardRequest extends FormRequest
         'delivery_address.required' => 'The delivery address is required.',
         'delivery_address.string'   => 'The delivery address must be a valid Address.',
 
-        'phone.required'            => 'The phone number is required.',
-        'phone.digits_between'      => 'The phone number must be between 10 and 15 digits.',
+        'phone_number.required'            => 'The phone number is required.',
+        'phone_number.digits_between'      => 'The phone number must be between 10 and 15 digits.',
 
         'payment_method.required'   => 'The payment method is required.',
         'payment_method.in'         => 'The selected payment method must be either COD or Visa.',

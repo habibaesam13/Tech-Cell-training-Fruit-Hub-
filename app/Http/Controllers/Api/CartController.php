@@ -38,7 +38,6 @@ class CartController extends Controller
             ->where('product_id', $product->id)
             ->first();
 
-        
 
         if ($cartItem) {
             // Check again for total quantity if increasing
