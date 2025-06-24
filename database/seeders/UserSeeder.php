@@ -20,7 +20,7 @@ class UserSeeder extends Seeder
                 'name' => 'Admin User',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('password'),
-              'phone_number'=>'123456789',
+                'phone_number'=>'123456789',
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
@@ -32,6 +32,7 @@ class UserSeeder extends Seeder
                 'email_verified_at' => now(),
                 'created_at' => now(),
                 'updated_at' => now(),
+                'phone_number'=>'',
             ],
 
         ]);
