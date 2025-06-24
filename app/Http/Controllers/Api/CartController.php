@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Traits\ApiResponseTrait;
 use App\Http\Requests\StoreCartItemRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
@@ -17,8 +18,9 @@ class CartController extends Controller
     
     public function store(StoreCartItemRequest $request)
     {
-        // $user = $request->user();
-        $user = User::find(1);
+
+         $user = Auth::user();
+        // $user = User::find(1);
         $product = Product::findOrFail($request->product_id);
 
             // Check stock availability
@@ -72,7 +74,7 @@ class CartController extends Controller
 
     public function index(Request $request)
 {
-    $user = User::find(1);
+    $user = Auth::user();
     $cart = $user->cart;
 
     if (!$cart) {

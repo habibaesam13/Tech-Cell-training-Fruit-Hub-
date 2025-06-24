@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Api;
-
+use Illuminate\Support\Facades\Auth;
 use App\Models\Card;
 use App\Models\Cart;
 use App\Models\Order;
@@ -19,22 +19,20 @@ class PaymentController extends Controller
 public function store(StorCardRequest $storCardRequest)
 {
     $data = $storCardRequest->validated();
-
+    $userId = Auth::user()->id;
     // Get user's cart and items
-    $cart = Cart::where('user_id', $data['user_id'])->first();
+    $cart = Cart::where('user_id', $userId)->first();
 
     if (!$cart || $cart->items->isEmpty()) {
         return $this->errorResponse('Cart is empty or not found.', 404);
     }
 
     // Calculate total
-    $total = $cart->items->sum(function ($item) {
-        return $item->price * $item->quantity;
-    });
+    $total = $cart->items->sum(fn($item) => $item->price * $item->quantity);
 
     // Create Order
     $order = Order::create([
-        "user_id"          => $data['user_id'],
+        'user_id'          => $userId,
         'phone_number'     => $data['phone_number'],
         'status'           => 'pending',
         'total'            => $total,
@@ -56,16 +54,15 @@ public function store(StorCardRequest $storCardRequest)
     $cardId = null;
 
     if ($paymentMethod === 'visa') {
-        // Store card (or retrieve existing)
         $card = Card::firstOrCreate(
             ['card_number' => $data['card_number']],
             [
                 'holder_name' => $data['holder_name'],
                 'expiry_date' => $data['expiry_date'],
                 'ccv'         => $data['ccv'],
+                'user_id'     => $userId, // optional: associate card with user
             ]
         );
-
         $cardId = $card->id;
     }
 
@@ -79,13 +76,14 @@ public function store(StorCardRequest $storCardRequest)
         'transaction_id'  => $paymentMethod === 'visa' ? uniqid('TXN') : null,
     ]);
 
-    // ✅ Update order status if payment is visa
+    // Update order status if paid
     if ($paymentMethod === 'visa') {
-        $order->update([
-            'status' => 'paid'
-        ]);
+        $order->update(['status' => 'paid']);
     }
-    $cart->items()->delete();   
+
+    // Clear cart items
+    $cart->items()->delete();
+
     return $this->successResponse(
         [
             'order'   => $order->load('items.product'),
@@ -95,4 +93,5 @@ public function store(StorCardRequest $storCardRequest)
         200
     );
 }
+
 }

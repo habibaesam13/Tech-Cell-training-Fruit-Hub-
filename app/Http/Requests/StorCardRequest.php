@@ -25,7 +25,6 @@ class StorCardRequest extends FormRequest
             'delivery_address' => 'required|string|max:255',
             'phone_number' => 'required|digits_between:10,15',
             'payment_method' => 'required|in:COD,visa',
-            'user_id'       => 'required|exists:users,id',
             // Required if visa payment
             'holder_name'   => 'required_if:payment_method,visa|string|max:100',
             'card_number' => 'required_if:payment_method,visa|digits:16',
@@ -36,8 +35,7 @@ class StorCardRequest extends FormRequest
     public function messages(): array
 {
     return [
-        'user_id.required' => 'User ID is required.',
-        'user_id.exists'   => 'The selected user does not exist in the system.',
+
         
         'delivery_address.required' => 'The delivery address is required.',
         'delivery_address.string'   => 'The delivery address must be a valid Address.',
