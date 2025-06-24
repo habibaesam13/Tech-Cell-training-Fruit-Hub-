@@ -10,13 +10,19 @@ use App\Http\Controllers\Controller;
 class ProductsController extends Controller
 {
     use ApiResponseTrait;
-    public function index(){
-        $products = Product::all();
+    public function index(Request $request)
+{
+    $query = $request->input('search');
+
+    $products = Product::when($query, function ($q) use ($query) {
+        return $q->where('name', 'LIKE', '%' . $query . '%');
+    })->get();
 
     return $this->successResponse([
         'products' => $products
-    ],'Products retrived successfully',200);
-    }
+    ], 'Products retrieved successfully', 200);
+}
+
 
 public function show(Product $product)
 {
