@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\ApiResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    //
+    use ApiResponseTrait;
 
     public function Register(Request $request)
     {
@@ -21,12 +22,7 @@ class AuthController extends Controller
             'phone_number' => 'nullable|string|max:20'
         ]);
         if ($validate->fails()) {
-            return response()->json([
-                "status" => 0,
-
-                "message" => "validation Erorr",
-                "data" => $validate->errors()->all()
-            ], 422);
+            return $this->errorResponse($validate->errors()->all(), 422);
         }
 
         $user = User::create([
@@ -40,11 +36,7 @@ class AuthController extends Controller
         $response["token"] = $user->createToken('authToken')->plainTextToken;
         $response["name"] = $user->name;
         $response["email"] = $user->email;
-        return response()->json([
-            "status" => 1,
-            "message" => "User has been registerd successfully",
-            "data" => $response
-        ], 201);
+        return $this->successResponse($response, "User has been registerd successfully", 201);
     }
 
     public function Login(Request $request)
@@ -54,28 +46,16 @@ class AuthController extends Controller
             "password" => 'required|string'
         ]);
         if (!Auth::attempt($request->only('email', 'password'))) {
-            return response()->json([
-                "status" => 0,
-                "message" => "invalid email or password ",
-                "data" => null
-            ], 401);
+            return  $this->errorResponse("invalid email or password ", 401);
         }
         $user =  User::where("email", $request->email)->firstOrFail();
 
         $token = $user->createToken('authToken')->plainTextToken;
-
-        return response()->json([
-            "status" => 1,
-            "message" => "logged in successfully.",
-            "data" => $user,
-            $token
-        ], 200);
+        return $this->successResponse(["user" => $user, "token" => $token], "logged in successfully.");
     }
     public function Logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
-        return response()->json([
-            "message" => "logged out successfully."
-        ]);
+        return $this->successResponse([], "logged out successfully.");
     }
 }
