@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
-    protected $fillable=[
+    protected $fillable = [
         "name",
         "price",
         "description",
@@ -17,13 +17,16 @@ class Product extends Model
     ];
 
     public function cartItems()
-{
-    return $this->hasMany(CartItems::class);
-}
+    {
+        return $this->hasMany(CartItems::class);
+    }
 
-public function orderItems()
-{
-    return $this->hasMany(OrderItems::class);
-}
-
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItems::class);
+    }
+    public function favouritedByUsers()
+    {
+        return $this->belongsToMany(User::class, 'favourites');
+    }
 }
