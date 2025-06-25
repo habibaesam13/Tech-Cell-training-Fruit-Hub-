@@ -31,4 +31,6 @@ public function show(Product $product)
     ], 'Product retrieved successfully',
 200);
 }
+
+
 }
