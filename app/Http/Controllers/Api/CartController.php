@@ -15,15 +15,15 @@ use Illuminate\Support\Facades\Auth;
 class CartController extends Controller
 {
     use ApiResponseTrait;
-    
+
     public function store(StoreCartItemRequest $request)
     {
 
-         $user = Auth::user();
+        $user = Auth::user();
         // $user = User::find(1);
         $product = Product::findOrFail($request->product_id);
 
-            // Check stock availability
+        // Check stock availability
         if ($product->quantity < $request->quantity) {
             return $this->errorResponse("Only {$product->stock} items left in stock.", 422);
         }
@@ -35,7 +35,7 @@ class CartController extends Controller
             ]);
         }
 
-        $cartId = $cart->id; 
+        $cartId = $cart->id;
         $cartItem = CartItems::where('cart_id', $cart->id)
             ->where('product_id', $product->id)
             ->first();
@@ -53,7 +53,8 @@ class CartController extends Controller
         } else {
             // Create new cart item
             $cartItem = CartItems::create([
-                'cart_id' =>$cartId,
+                'cart_id' => $cartId,
+                'name' => $product->name,
                 'product_id' => $product->id,
                 'quantity' => $request->quantity,
                 'price' => $product->price,
@@ -73,24 +74,23 @@ class CartController extends Controller
 
 
     public function index(Request $request)
-{
-    $user = Auth::user();
-    $cart = $user->cart;
+    {
+        $user = Auth::user();
+        $cart = $user->cart;
 
-    if (!$cart) {
+        if (!$cart) {
+            return response()->json([
+                'message' => 'Cart is empty or not created yet.',
+                'items' => [],
+            ]);
+        }
+
+        $cartItems = CartItems::with('product')
+            ->where('cart_id', $cart->id)
+            ->get();
+
         return response()->json([
-            'message' => 'Cart is empty or not created yet.',
-            'items' => [],
+            'items' => $cartItems,
         ]);
     }
-
-    $cartItems = CartItems::with('product')
-        ->where('cart_id', $cart->id)
-        ->get();
-
-    return response()->json([
-        'items' => $cartItems,
-    ]);
-}
-
 }
