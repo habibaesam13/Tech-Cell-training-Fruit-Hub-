@@ -29,7 +29,7 @@ class ProductsController extends Controller
     {
         return $this->successResponse(
             [
-                'product' =>  ProductResource::collection($product),
+                'product' =>   new ProductResource($product),
             ],
             'Product retrieved successfully',
             200
