@@ -14,6 +14,8 @@ class Product extends Model
         "description",
         "image",
         "quantity",
+        "category_id",
+        "ingredients"
     ];
 
     public function cartItems()
@@ -29,4 +31,9 @@ class Product extends Model
     {
         return $this->belongsToMany(User::class, 'favourites');
     }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+   
 }
