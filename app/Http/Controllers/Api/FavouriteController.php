@@ -32,17 +32,7 @@ class FavouriteController extends Controller
         return $this->successResponse($favouriteProducts, 'success', 201);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
+   
     public function store(Request $request)
     {
         $request->validate([
@@ -54,32 +44,4 @@ class FavouriteController extends Controller
         return  $this->successResponse(null, "Product added to favourites", 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Favourite $favourite)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Favourite $favourite)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Favourite $favourite)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Favourite $favourite) {}
 }
